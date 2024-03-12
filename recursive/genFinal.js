@@ -30,7 +30,7 @@ module.exports.genFinalSetup = async function genFinalSetup(fileName, constRoot,
 
 
     // Compile circom
-    const compileRecursiveCommand = `circom --O1 --r1cs --sym --inspect --c --wasm --verbose -l src/circuits -l node_modules/pil-stark/circuits.bn128 -l node_modules/circomlib/circuits ${buildDir}/final.circom -o ${buildDir}`;
+    const compileRecursiveCommand = `circom --O1 --r1cs --sym --inspect --c --wasm --verbose -l node_modules/pil-stark/circuits.bn128 -l node_modules/circomlib/circuits ${buildDir}/final.circom -o ${buildDir}`;
     const execCompile = await exec(compileRecursiveCommand);
     console.log(execCompile.stdout);
 

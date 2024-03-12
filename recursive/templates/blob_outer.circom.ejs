@@ -1,3 +1,6 @@
+pragma circom 2.1.0;
+pragma custom_templates;
+
 include "<%- verifierNames[0] %>.verifier.circom";
 include "<%- verifierNames[1] %>.verifier.circom";
 
@@ -92,11 +95,9 @@ template Main() {
 <% p += 8; -%>
     var oldBlobOuterAccInputHashPos = <%- p %>;
 <% p += 8; -%>
-    var oldBlobOuterNumPos = <%- p %>; <% p += 8; -%>
-
+    var oldBlobOuterNumPos = <%- p++ %>;
     var chainIdBlobOuterPos = <%- p++ %>;
     var forkIdBlobOuterPos = <%- p++ %>;
-
     var newBlobOuterStateRootPos = <%- p %>;
 <% p += 8; -%>
     var newBlobOuterBlobStateRootPos = <%- p %>;
@@ -110,6 +111,7 @@ template Main() {
 
     signal input publics[<%- nPublicsBlobOuter %>];
     signal input rootC[4];
+    signal input chainId;
 
     // Batch Proof Inputs
     signal input batch_publics[<%- nPublicsBatch %>];
@@ -183,7 +185,7 @@ template Main() {
 
     signal isInvalidFinalAccBatchHashData <== IsZero()(isFinalAccBatchDataZero[0] + isFinalAccBatchDataZero[1] + isFinalAccBatchDataZero[2] + isFinalAccBatchDataZero[3] + isFinalAccBatchDataZero[4] + isFinalAccBatchDataZero[5] + isFinalAccBatchDataZero[6] + isFinalAccBatchDataZero[7] - 8);
     
-    // Check if the blob is valid (which means either isInvalid equals 1 or final acc batch data equals 0)
+    // Check if the blob is valid (which means that isInvalid and isInvalidFinalAccBatchHashData both equals 0)
     signal isValidBlob <== IsZero()(isInvalidBlob + isInvalidFinalAccBatchHashData);
 
     component vBatch = StarkVerifier();
@@ -226,7 +228,7 @@ template Main() {
         vBatch.publics[<%- nPublicsBatch %> + i] <== rootCRecursive2Batch[i];
     }
 
-    component vBlob = StarkVerifier();
+    component vBlob = StarkVerifier2();
 
     for (var i=0; i< <%- nPublicsBlobInner %>; i++) {
         vBlob.publics[i] <== blob_inner_publics[i];
@@ -274,9 +276,9 @@ template Main() {
     }
 
     // Check that batch new last timestamp is less than or equal than the blob timestamp limit
-    signal isValidTimestamp <== LessEqThan(62)(batch_publics[newLastTimestampPos], blob_inner_publics[timestampLimitPos]);
+    signal isValidTimestamp <== LessEqThan(62)([batch_publics[newLastTimestampPos], blob_inner_publics[timestampLimitPos]]);
 
-    signal isValid <== IsZero()(isValidBlob + isValidL1InfoTreeIndex + isValidTimestamp - 4);
+    signal isValid <== IsZero()(isValidBlob + isValidL1InfoTreeIndex + isValidTimestamp - 3);
 
     // Check publics
 

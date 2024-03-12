@@ -50,7 +50,7 @@ module.exports.genSetup = async function genSetup(template, starkStruct, fileNam
         let verifier2Filename = `${buildDir}/${verifierNames[1]}.verifier.circom`;
 
         const constRoot2 = vks[2] || undefined;
-        const verifierCircom2Template = await pil2circom(constRoot2, starkInfoVerifiers[1], { skipMain });
+        const verifierCircom2Template = await pil2circom(constRoot2, starkInfoVerifiers[1], { skipMain, index: 2 });
         await fs.promises.writeFile(verifier2Filename, verifierCircom2Template, "utf8");
     }
 
@@ -67,7 +67,7 @@ module.exports.genSetup = async function genSetup(template, starkStruct, fileNam
     } 
   
     // Compile circom
-    const compileRecursiveCommand = `circom --O1 --r1cs --sym --prime goldilocks --inspect --wasm --c --verbose -l node_modules/pil-stark/circuits.gl -l src/circuits ${recursiveFilename} -o ${buildDir}`;
+    const compileRecursiveCommand = `circom --O1 --r1cs --sym --prime goldilocks --inspect --wasm --c --verbose -l node_modules/pil-stark/circuits.gl ${recursiveFilename} -o ${buildDir}`;
     const execCompile = await exec(compileRecursiveCommand);
     console.log(execCompile.stdout);
 
