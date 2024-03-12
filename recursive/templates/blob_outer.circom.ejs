@@ -176,7 +176,12 @@ template Main() {
     signal isInvalidBlob <== IsZero()(blob_inner_publics[isInvalidBlobInnerPos] - 1);
 
     // Check if the final acc batch hash data is invalid (i.e. is zero)
-    signal isInvalidFinalAccBatchHashData <== IsZero()(blob_inner_publics[finalAccBatchHashDataPos]);
+    signal isFinalAccBatchDataZero[8];
+    for (var i=0; i<8; i++) {
+        isFinalAccBatchDataZero[i] <== IsZero()(blob_inner_publics[finalAccBatchHashDataPos + i]);
+    }
+
+    signal isInvalidFinalAccBatchHashData <== IsZero()(isFinalAccBatchDataZero[0] + isFinalAccBatchDataZero[1] + isFinalAccBatchDataZero[2] + isFinalAccBatchDataZero[3] + isFinalAccBatchDataZero[4] + isFinalAccBatchDataZero[5] + isFinalAccBatchDataZero[6] + isFinalAccBatchDataZero[7] - 8);
     
     // Check if the blob is valid (which means either isInvalid equals 1 or final acc batch data equals 0)
     signal isValidBlob <== IsZero()(isInvalidBlob + isInvalidFinalAccBatchHashData);
@@ -281,7 +286,7 @@ template Main() {
         oldStateRoot[i] <== Mux1()([blob_inner_publics[oldBlobInnerStateRootPos + i], batch_publics[oldBatchStatePos + i]], isValid);
         publics[oldBlobOuterStateRootPos + i] === oldStateRoot[i];
 
-        publics[oldBlobOuterBlobStateRootPos + i] === blob_inner_publics[oldBlobInnerBlobStateRootPos];
+        publics[oldBlobOuterBlobStateRootPos + i] === blob_inner_publics[oldBlobInnerBlobStateRootPos + i];
 
         publics[oldBlobOuterAccInputHashPos + i] === blob_inner_publics[oldBlobInnerAccInputHashPos + i];
 

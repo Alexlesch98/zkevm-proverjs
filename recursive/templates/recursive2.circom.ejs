@@ -50,8 +50,7 @@ template Main() {
 <% p += 8; -%>
     var oldBlobOuterAccInputHashPos = <%- p %>;
 <% p += 8; -%>
-    var oldBlobOuterNumPos = <%- p %>;
-<% p += 8; -%>
+    var oldBlobOuterNumPos = <%- p++ %>;
 
     var chainIdBlobOuterPos = <%- p++ %>;
     var forkIdBlobOuterPos = <%- p++ %>;
